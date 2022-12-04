@@ -52,9 +52,7 @@ case object Empty extends MyList[Nothing] {
   def flatMap[B](transformer: Nothing => MyList[B]): MyList[B] = Empty
   def filter(predicate: Nothing => Boolean): MyList[Nothing] = Empty
 
-  def ++[B >: Nothing](list: MyList[B]): MyList[B] = {
-    Cons(list.head, list.tail)
-  }
+  def ++[B >: Nothing](list: MyList[B]): MyList[B] = list
 
   def foreach(f: Nothing => Unit): Unit = ()
 
@@ -71,8 +69,7 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
   }
 
   def addEnd[B >: A](element: B): MyList[B] = {
-    if (t.isEmpty) Cons(h, Cons(element, Empty))
-    else Cons(h, t.addEnd(element))
+    Cons(h, t.addEnd(element))
   }
 
   def printElements: String = {
@@ -92,7 +89,6 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
   }
 
   def map[B](transformer: A => B): MyList[B] = {
-    if (t.isEmpty) Cons(transformer(h), Empty)
     Cons(transformer(h), t.map(transformer))
   }
 
@@ -101,16 +97,12 @@ case class Cons[+A](h: A, t: MyList[A]) extends MyList[A] {
   }
 
   def flatMap[B](transformer: A => MyList[B]): MyList[B] = {
-    if (t.isEmpty) transformer(h)
-    else transformer(h) ++ t.flatMap(transformer)
+    transformer(h) ++ t.flatMap(transformer)
   }
 
   def foreach(f: A => Unit): Unit = {
-    if (t.isEmpty) f(h)
-    else {
-      f(h)
-      t.foreach(f)
-    }
+    f(h)
+    t.foreach(f)
   }
 
   def zipWith[B, C](list: MyList[B], zip: (A, B) => C): MyList[C] = {
